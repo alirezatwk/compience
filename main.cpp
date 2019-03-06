@@ -22,7 +22,7 @@ int main(){
 	}
 
 
-	int result = 0;
+	int result = 0, sign = 1;
 	bool wait_for_number = true;
 	for ( std::vector<std::string>::iterator it = elements.begin(); it != elements.end(); ++it ) {
 		if ((*it) == "+"){
@@ -31,6 +31,18 @@ int main(){
 				return -1;
 			} else {
 				wait_for_number = true;
+				sign = 1;
+				continue;
+			}
+		}
+
+		if ((*it) == "-"){
+			if (wait_for_number) {
+				std::cout << "ERROR" << std::endl;
+				return -1;
+			} else {
+				wait_for_number = true;
+				sign = -1;
 				continue;
 			}
 		}
@@ -41,7 +53,7 @@ int main(){
 				is_number = false;
 
 		if (is_number && wait_for_number) {
-			result += std::atoi(it->c_str());
+			result += std::atoi(it->c_str()) * sign;
 			wait_for_number = false;
 		} else {
 			std::cout << "ERROR" << std::endl;
