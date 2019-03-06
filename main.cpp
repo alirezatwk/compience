@@ -2,8 +2,46 @@
 #include<vector>
 #include<string>
 
+#include "thing.h"
 
-int main(){
+std::string priorities[4] = { "+", "-", "/", "*" };
+bool error = false;
+
+Thing* parse(const std::vector<std::string>* elements, int l, int r) {
+	if (l >= r) {
+		error = true;
+		return NULL;
+	}
+
+	for ( int i = 0; i < 4; i++ )
+		for ( int mid = l; mid < r; mid++ )
+			if ((*elements)[mid] == priorities[i])
+				return new Thing(
+						priorities[i][0],
+						parse(elements, l, mid),
+						parse(elements, mid + 1, r)
+						);
+
+	if (r - l != 1) {
+		error = true;
+		return NULL;
+	}
+
+	std::string str = (*elements)[l];
+	bool is_number = true;
+	for ( std::string::iterator it = str.begin() + (str[0] == '-' ? 1 : 0); it != str.end(); ++it)
+		if (not isdigit(*it))
+			is_number = false;
+
+	if (is_number) {
+		return new Thing(str);
+	} else {
+		error = true;
+		return NULL;
+	}
+}
+
+int main() {
 	std::string input;
 	std::getline(std::cin, input);
 	input.push_back(' ');
@@ -21,45 +59,12 @@ int main(){
 		}
 	}
 
+	Thing* t = parse(&elements, 0, elements.size());
 
-	int result = 0, sign = 1;
-	bool wait_for_number = true;
-	for ( std::vector<std::string>::iterator it = elements.begin(); it != elements.end(); ++it ) {
-		if ((*it) == "+"){
-			if (wait_for_number) {
-				std::cout << "ERROR" << std::endl;
-				return -1;
-			} else {
-				wait_for_number = true;
-				sign = 1;
-				continue;
-			}
-		}
-
-		if ((*it) == "-"){
-			if (wait_for_number) {
-				std::cout << "ERROR" << std::endl;
-				return -1;
-			} else {
-				wait_for_number = true;
-				sign = -1;
-				continue;
-			}
-		}
-
-		bool is_number = true;
-		for ( std::string::iterator cit = it->begin() + ((*it)[0] == '-' ? 1 : 0); cit != it->end(); ++cit)
-			if (not isdigit(*cit))
-				is_number = false;
-
-		if (is_number && wait_for_number) {
-			result += std::atoi(it->c_str()) * sign;
-			wait_for_number = false;
-		} else {
-			std::cout << "ERROR" << std::endl;
-			return -1;
-		}
+	if (error) {
+		std::cout << "ERROR" << std::endl;
+		return -1;
 	}
 
-	std::cout << result << std::endl;
+	std::cout << t->eval() << std::endl;
 }
