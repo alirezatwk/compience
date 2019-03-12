@@ -1,16 +1,18 @@
 #include<string>
-
+#include<map>
 
 class Thing {
 	public:
-		char type;
-		Thing* l;
-		Thing* r;
-
-		std::string str;
-
-		Thing(std::string str);
+		Thing(std::string str, bool isNumber = true);
 		Thing(char type, Thing* l, Thing* r);
 
-		int eval();
+		int eval(std::map<std::string, int> *variables);
+
+
+    private:
+
+        char type;
+        Thing* l;
+        Thing* r;
+        std::string str;
 };
